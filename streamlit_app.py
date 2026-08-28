@@ -207,18 +207,20 @@ with tabs[0]:
                 op = opinions_round0[agent_key]
                 verdict = op.get('verdict', 'unknown')
                 conf = op.get('confidence', 'unknown')
+                score = op.get('confidence_score', 50)
                 
                 # Render using native metric which we styled via CSS
-                st.metric(label=f"{icon} {agent_key.replace('_', ' ').title()}", value=conf.upper(), delta=verdict.upper().replace("_", " "), delta_color="off")
+                st.metric(label=f"{icon} {agent_key.replace('_', ' ').title()}", value=f"{conf.upper()} ({score}/100)", delta=verdict.upper().replace("_", " "), delta_color="off")
                 
                 # Use raw HTML for the beautiful pill styling underneath
                 st.markdown(f'<div class="verdict-pill {verdict}">{verdict.replace("_", " ")}</div>', unsafe_allow_html=True)
                 
-                with st.expander("View Evidence", expanded=True):
+                with st.expander("View Evidence (Verification Check)", expanded=True):
                     for ev in op.get('evidence', [])[:3]:
-                        verified = "✅" if ev.get("verified") else "⚠️"
-                        st.markdown(f"> *\"{ev.get('quote')}\"* {verified}")
-                        st.caption(f"Interpretation: {ev.get('interpretation')}")
+                        if ev.get("verified"):
+                            st.markdown(f'<div style="border-left: 4px solid #4ade80; padding-left: 12px; margin-bottom: 12px; font-size: 0.95rem;">✅ <strong>VERIFIED SOURCE:</strong><br/><em>"{ev.get("quote")}"</em><br/><span style="color:#a0aec0; font-size: 0.85rem;">Interpretation: {ev.get("interpretation")}</span></div>', unsafe_allow_html=True)
+                        else:
+                            st.markdown(f'<div style="border-left: 4px solid #f87171; padding: 12px; margin-bottom: 12px; background: rgba(248,113,113,0.1); border-radius: 4px; font-size: 0.95rem;">❌ <strong>HALLUCINATION DETECTED</strong><br/><span style="color:#f87171;">Agent hallucinates quote not present in source text:</span><br/><em>"{ev.get("quote")}"</em></div>', unsafe_allow_html=True)
             else:
                 st.info(f"{icon} No data.")
 

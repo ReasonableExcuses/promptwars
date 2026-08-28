@@ -21,6 +21,11 @@ Respond with exactly one of:
 - "partial_agree": the claim is valid but only partially affects your assessment.
   Explain what changes and what doesn't.
 
+You must output a JSON object matching the DebateTurn schema.
+If you revise your opinion, set `new_verdict`, `new_confidence`, and `new_confidence_score (0-100)`.
+If you concede, explain why and provide the response_evidence that changed your mind.
+If you rebut, provide response_evidence to defend your original claim.
+
 Do not concede just to appear collaborative, and do not rebut just to defend your
 first answer. Change your mind only if the evidence actually warrants it.
 
@@ -83,6 +88,7 @@ def run_debate_turn(tension: Tension, opinions_dict: dict, round_num: int, targe
             # Override prior states to ensure consistency
             turn.prior_verdict = target_opinion.verdict
             turn.prior_confidence = target_opinion.confidence
+            turn.prior_confidence_score = target_opinion.confidence_score
         
             return turn
         except Exception as e:
@@ -107,6 +113,8 @@ def apply_revision(opinion: AgentOpinion, turn: DebateTurn) -> AgentOpinion:
         new_opinion.verdict = turn.new_verdict
     if turn.new_confidence:
         new_opinion.confidence = turn.new_confidence
+    if turn.new_confidence_score:
+        new_opinion.confidence_score = turn.new_confidence_score
         
     # We could add the response evidence to the new opinion's evidence
     new_opinion.evidence.extend(turn.response_evidence)

@@ -86,6 +86,7 @@ class AgentOpinion(BaseModel):
     round: int                           # 0 = independent stage, 1+ = debate rounds
     verdict: Verdict
     confidence: Confidence
+    confidence_score: int = Field(default=50, ge=0, le=100, description="Numerical confidence score from 0 to 100")
     confidence_rationale: str
     evidence: list[EvidenceItem]
     open_questions: list[str]
@@ -122,10 +123,12 @@ class DebateTurn(BaseModel):
     source_quote: str
     response_type: ResponseType
     response_evidence: list[EvidenceItem]
-    prior_verdict: Verdict
+    prior_verdict: Verdict = Verdict.insufficient_data
     new_verdict: Optional[Verdict] = None       # None if unchanged
-    prior_confidence: Confidence
+    prior_confidence: Confidence = Confidence.medium
     new_confidence: Optional[Confidence] = None
+    prior_confidence_score: int = 50
+    new_confidence_score: Optional[int] = None
 
 class WeightClass(str, Enum):
     decisive = "decisive"

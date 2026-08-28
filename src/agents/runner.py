@@ -17,6 +17,9 @@ performed.
 You have not seen and must not reference or assume the opinions of any other
 reviewer. Form your judgment from the material given to you alone.
 
+You must assign a numerical `confidence_score` (0-100) reflecting the absolute 
+strength of your evidence supporting this verdict.
+
 Output must validate against the AgentOpinion schema. Return JSON only.
 """
 

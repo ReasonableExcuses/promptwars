@@ -31,7 +31,7 @@ def run_pipeline(candidate_id: str, name: str, resume_text: str, transcript_text
         else:
             print(msg)
 
-    log(f"[{candidate_id}] Building profile...")
+    log(f"🛠️ **Phase 1:** Extracting Profile for `{candidate_id}` from source documents...")
     profile = build_profile(resume_text, transcript_text, "AI Engineer — Agentic Systems (Freight Operations)")
     profile.candidate_id = candidate_id
     profile.name = name
@@ -41,10 +41,10 @@ def run_pipeline(candidate_id: str, name: str, resume_text: str, transcript_text
     with open(f"runs/{candidate_id}_profile.json", "w", encoding="utf-8") as f:
         f.write(profile.model_dump_json(indent=2))
 
-    log(f"[{candidate_id}] Collecting independent opinions...")
+    log(f"🤖 **Phase 2:** Collecting Independent Opinions...")
     opinions = {}
     for role in [AgentRole.technical, AgentRole.culture, AgentRole.hiring_manager, AgentRole.skeptic]:
-        log(f"  -> Calling {role.value} agent...")
+        log(f"  ↳ Booting `{role.value.upper()}` agent...")
         time.sleep(5)
         raw_opinion = call_agent(role, profile, resume_text, transcript_text, jd_text)
         raw_opinion.candidate_id = candidate_id
@@ -58,17 +58,21 @@ def run_pipeline(candidate_id: str, name: str, resume_text: str, transcript_text
 
     debate_log = []
     tensions = []
-    log(f"[{candidate_id}] Entering debate stage...")
+    log(f"⚔️ **Phase 3:** Entering Debate & Cross-Examination...")
     for round_num in range(1, MAX_ROUNDS + 1):
-        log(f"  -> Round {round_num}")
+        log(f"🔄 **Debate Round {round_num}**")
         tensions = detect_tensions(list(opinions.values()))
         if not tensions:
-            log("  -> No tensions detected. Converged.")
+            log("🤝 **Consensus:** No tensions detected. Agents are aligned.")
             break
         
         any_revision = False
         for tension in tensions:
-            log(f"    -> Tension detected between {tension.agent_a.value} and {tension.agent_b.value}: {tension.tension_type.value}")
+            a_conf = opinions[tension.agent_a].confidence_score
+            b_conf = opinions[tension.agent_b].confidence_score
+            gap = abs(a_conf - b_conf)
+            log(f"⚡ **TENSION DETECTED:** {tension.agent_a.value.upper()} vs {tension.agent_b.value.upper()}")
+            log(f"  ↳ Type: {tension.tension_type.value} | Disagreement Magnitude: **{gap} points**")
             time.sleep(5)
             
             # Agent B responds to Agent A
@@ -77,12 +81,12 @@ def run_pipeline(candidate_id: str, name: str, resume_text: str, transcript_text
             turn_b.response_evidence = [ev for ev in turn_b.response_evidence if ev.verified]
             debate_log.append(turn_b)
             
-            if turn_b.new_verdict or turn_b.new_confidence:
-                log(f"      -> {turn_b.target_agent.value} revised opinion ({turn_b.response_type.value})")
+            if turn_b.new_verdict or turn_b.new_confidence or turn_b.new_confidence_score:
+                log(f"  ↳ {turn_b.target_agent.value.upper()} **{turn_b.response_type.value.upper()}** (Revised opinion)")
                 opinions[turn_b.target_agent] = apply_revision(opinions[turn_b.target_agent], turn_b)
                 any_revision = True
             else:
-                log(f"      -> {turn_b.target_agent.value} stood firm ({turn_b.response_type.value})")
+                log(f"  ↳ {turn_b.target_agent.value.upper()} **{turn_b.response_type.value.upper()}** (Stood firm)")
                 
             time.sleep(5)
             
@@ -92,16 +96,18 @@ def run_pipeline(candidate_id: str, name: str, resume_text: str, transcript_text
             turn_a.response_evidence = [ev for ev in turn_a.response_evidence if ev.verified]
             debate_log.append(turn_a)
             
-            if turn_a.new_verdict or turn_a.new_confidence:
-                log(f"      -> {turn_a.target_agent.value} revised opinion ({turn_a.response_type.value})")
+            if turn_a.new_verdict or turn_a.new_confidence or turn_a.new_confidence_score:
+                log(f"  ↳ {turn_a.target_agent.value.upper()} **{turn_a.response_type.value.upper()}** (Revised opinion)")
                 opinions[turn_a.target_agent] = apply_revision(opinions[turn_a.target_agent], turn_a)
                 any_revision = True
             else:
-                log(f"      -> {turn_a.target_agent.value} stood firm ({turn_a.response_type.value})")
+                log(f"  ↳ {turn_a.target_agent.value.upper()} **{turn_a.response_type.value.upper()}** (Stood firm)")
                 
         if not any_revision:
-            log("  -> No revisions made. Converged.")
+            log("🤝 **Debate Concluded:** Agents reached convergence with no further revisions.")
             break
+    else:
+        log("⚠️ **Debate Exhausted:** Maximum rounds reached. Unresolved tensions escalated to Chair.")
 
     # Re-evaluate tensions after final round to capture unresolved ones
     tensions = detect_tensions(list(opinions.values()))
@@ -112,7 +118,7 @@ def run_pipeline(candidate_id: str, name: str, resume_text: str, transcript_text
     with open(f"runs/{candidate_id}_debate_log.json", "w", encoding="utf-8") as f:
         json.dump([t.model_dump() for t in debate_log], f, indent=2)
 
-    log(f"[{candidate_id}] Synthesizing final decision...")
+    log(f"⚖️ **Phase 4:** Synthesizing Final Decision (Chair Agent)...")
     time.sleep(5)
     try:
         decision = call_decision_synthesizer(jd_text, opinions, debate_log, tensions)
