@@ -119,16 +119,16 @@ st.markdown('<div class="subtitle" role="doc-subtitle">Simulating real-world deb
 # Sidebar
 st.sidebar.image("https://via.placeholder.com/400x150.png?text=PromptWars+Engine", use_container_width=True)
 st.sidebar.header("⚙️ Configuration")
-mode = st.sidebar.radio("Run Mode", ["View Example (Offline)", "Live Run (Requires API Key)"])
 
-if mode == "Live Run (Requires API Key)":
-    api_key = st.sidebar.text_input("Groq API Key", type="password")
-    if api_key:
-        os.environ["GROQ_API_KEY"] = api_key
+api_key = st.sidebar.text_input("Groq API Key", type="password")
+if api_key:
+    os.environ["GROQ_API_KEY"] = api_key
 
-candidate_options = {"Candidate A": "Candidate_A", "Candidate B": "Candidate_B"}
-if mode == "Live Run (Requires API Key)":
-    candidate_options["✨ Custom Input"] = "Custom_Candidate"
+candidate_options = {
+    "Candidate A": "Candidate_A", 
+    "Candidate B": "Candidate_B",
+    "✨ Custom Input": "Custom_Candidate"
+}
 selected_candidate_name = st.sidebar.selectbox("Select Candidate", list(candidate_options.keys()))
 
 def sanitize_filename(cid: str) -> str:
@@ -190,15 +190,14 @@ if cid == "Custom_Candidate":
     custom_transcript = st.text_area("Interview Transcript", placeholder="Paste Interview Transcript here...", height=200)
     st.divider()
 
-if mode == "Live Run (Requires API Key)":
-    if st.sidebar.button("▶️ Run End-to-End Pipeline", type="primary", use_container_width=True):
-        if cid == "Custom_Candidate" and not (custom_jd and custom_resume and custom_transcript):
-            st.sidebar.error("Please fill all custom input fields!")
-        else:
-            run_live_pipeline(cid, custom_resume, custom_transcript, custom_jd)
+if st.sidebar.button("▶️ Run End-to-End Pipeline", type="primary", use_container_width=True):
+    if cid == "Custom_Candidate" and not (custom_jd and custom_resume and custom_transcript):
+        st.sidebar.error("Please fill all custom input fields!")
+    else:
+        run_live_pipeline(cid, custom_resume, custom_transcript, custom_jd)
 
 # Load Data
-data_dir = "examples" if mode == "View Example (Offline)" else "runs"
+data_dir = "runs"
 profile = load_json(f"{data_dir}/{cid}_profile.json")
 opinions_round0 = load_json(f"{data_dir}/{cid}_opinions_round0.json")
 debate_log = load_json(f"{data_dir}/{cid}_debate_log.json")
