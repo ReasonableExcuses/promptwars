@@ -1,5 +1,6 @@
 import os
 import json
+import time
 import traceback
 from src.schemas import AgentRole
 from src.profile_builder import build_profile
@@ -38,6 +39,7 @@ def run_pipeline(candidate_id: str, name: str, resume_text: str, transcript_text
     opinions = {}
     for role in [AgentRole.technical, AgentRole.culture, AgentRole.hiring_manager, AgentRole.skeptic]:
         print(f"  -> Calling {role.value} agent...")
+        time.sleep(5)
         raw_opinion = call_agent(role, profile, resume_text, transcript_text, jd_text)
         raw_opinion.candidate_id = candidate_id
         
@@ -61,6 +63,7 @@ def run_pipeline(candidate_id: str, name: str, resume_text: str, transcript_text
         any_revision = False
         for tension in tensions:
             print(f"    -> Tension detected between {tension.agent_a.value} and {tension.agent_b.value}: {tension.tension_type.value}")
+            time.sleep(5)
             turn = run_debate_turn(tension, opinions, round_num)
             turn = verify_evidence_on_turn(turn, resume_text + transcript_text)
             
@@ -89,6 +92,7 @@ def run_pipeline(candidate_id: str, name: str, resume_text: str, transcript_text
         json.dump([t.model_dump() for t in debate_log], f, indent=2)
 
     print(f"[{candidate_id}] Synthesizing final decision...")
+    time.sleep(5)
     try:
         decision = call_decision_synthesizer(jd_text, opinions, debate_log, tensions)
     except Exception as e:
