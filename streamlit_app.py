@@ -206,7 +206,7 @@ decision = load_json(f"{data_dir}/{cid}_decision.json")
 final_report = load_file(f"{data_dir}/{cid}_final_report.md")
 
 if not profile or not opinions_round0:
-    st.warning(f"No data found for {cid} in `{data_dir}/`. Please run the pipeline or select a valid example.")
+    st.info(f"⏳ **Awaiting Execution:** No data found for `{cid}` in the `{data_dir}/` directory. Please click **▶️ Run End-to-End Pipeline** in the sidebar to generate the evaluation.")
     st.stop()
 
 # Layout Tabs
@@ -298,7 +298,7 @@ with tabs[2]:
 # TAB 4: Compare Candidates
 with tabs[3]:
     st.markdown("### Executive Summary")
-    comp_cols = st.columns(2)
+    comp_cols = st.columns(len(candidate_options))
     for idx, (name, key) in enumerate(candidate_options.items()):
         with comp_cols[idx]:
             st.subheader(name)
