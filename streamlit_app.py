@@ -103,7 +103,6 @@ st.markdown("""
         border-radius: 50%;
         box-shadow: 0 0 10px rgba(255, 107, 107, 0.6);
     }
-"""
     
     .agent-name {
         font-weight: 800;
