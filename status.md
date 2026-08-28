@@ -16,9 +16,10 @@ The system is a Multi-Agent AI Interview Panel Simulator consisting of:
 All core milestones (1 through 5) from the build spec are completed. The project layout is intact and the CLI app (`app.py`) is prepared.
 
 ## Running the App
-The application is now fully configured to run for free using Groq's API and the `instructor` library.
-Your API key is already configured as the default! You can just run:
+The application is configured to run for free using Groq's API and the `instructor` library.
+You must provide your own Groq API key in your environment variables:
 ```bash
+$env:GROQ_API_KEY="gsk_..."
 python app.py --candidate ALL
 ```
 All outputs and intermediate artifacts (agent opinions, debate logs, final decision) will be saved in the `runs/` directory automatically.

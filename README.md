@@ -37,8 +37,6 @@ This project is an advanced multi-agent evaluation system designed to simulate a
 
 3. Set your Groq API Key:
    ```bash
-   # Optional: The code currently has a default API key injected. 
-   # Set this if you want to use your own.
    $env:GROQ_API_KEY="gsk_..."
    ```
 

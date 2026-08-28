@@ -29,18 +29,13 @@ response_evidence, prior_verdict, new_verdict, prior_confidence, new_confidence)
 Return JSON only.
 """
 
-def run_debate_turn(tension: Tension, opinions_dict: dict, round_num: int) -> DebateTurn:
+def run_debate_turn(tension: Tension, opinions_dict: dict, round_num: int, target_agent, source_agent) -> DebateTurn:
     """
     Executes a single debate turn by calling the target agent LLM.
-    Target agent is randomly chosen between agent_a and agent_b for simplicity, 
-    but the plan says 'the target agent'. We will default to agent_b being the target.
-    In a real scenario, we might want to ask both or alternate. Here we ask agent_b to respond to agent_a.
+    We pass in the specific target_agent and source_agent to allow both sides to respond.
     """
     api_key = os.environ.get("GROQ_API_KEY")
     client = instructor.from_groq(Groq(api_key=api_key), mode=instructor.Mode.JSON)
-    
-    source_agent = tension.agent_a
-    target_agent = tension.agent_b
     
     # In some tension types we might swap them to make sense, but for now fixed.
     source_opinion = opinions_dict[source_agent]

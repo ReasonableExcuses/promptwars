@@ -1,0 +1,90 @@
+{
+  "technical": {
+    "opinion_id": "o_technical",
+    "agent_role": "technical",
+    "candidate_id": "Candidate_A",
+    "round": 0,
+    "verdict": "strong_hire",
+    "confidence": "high",
+    "confidence_rationale": "Solid experience",
+    "evidence": [
+      {
+        "claim": "Good Python skills",
+        "quote": "I know Python.",
+        "source": "transcript",
+        "interpretation": "Shows Python skills",
+        "verified": true
+      }
+    ],
+    "open_questions": [],
+    "insufficient_info_flags": [],
+    "revision_of": null,
+    "revision_reason": null
+  },
+  "culture": {
+    "opinion_id": "o_culture",
+    "agent_role": "culture",
+    "candidate_id": "Candidate_A",
+    "round": 0,
+    "verdict": "strong_hire",
+    "confidence": "high",
+    "confidence_rationale": "Solid experience",
+    "evidence": [
+      {
+        "claim": "Good Python skills",
+        "quote": "I know Python.",
+        "source": "transcript",
+        "interpretation": "Shows Python skills",
+        "verified": true
+      }
+    ],
+    "open_questions": [],
+    "insufficient_info_flags": [],
+    "revision_of": null,
+    "revision_reason": null
+  },
+  "hiring_manager": {
+    "opinion_id": "o_hiring_manager",
+    "agent_role": "hiring_manager",
+    "candidate_id": "Candidate_A",
+    "round": 0,
+    "verdict": "strong_hire",
+    "confidence": "high",
+    "confidence_rationale": "Solid experience",
+    "evidence": [
+      {
+        "claim": "Good Python skills",
+        "quote": "I know Python.",
+        "source": "transcript",
+        "interpretation": "Shows Python skills",
+        "verified": true
+      }
+    ],
+    "open_questions": [],
+    "insufficient_info_flags": [],
+    "revision_of": null,
+    "revision_reason": null
+  },
+  "skeptic": {
+    "opinion_id": "o_skeptic",
+    "agent_role": "skeptic",
+    "candidate_id": "Candidate_A",
+    "round": 0,
+    "verdict": "strong_hire",
+    "confidence": "high",
+    "confidence_rationale": "Solid experience",
+    "evidence": [
+      {
+        "claim": "Good Python skills",
+        "quote": "I know Python.",
+        "source": "transcript",
+        "interpretation": "Shows Python skills",
+        "verified": true
+      }
+    ],
+    "open_questions": [],
+    "insufficient_info_flags": [],
+    "revision_of": null,
+    "revision_reason": null
+  }
+}

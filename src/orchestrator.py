@@ -64,19 +64,34 @@ def run_pipeline(candidate_id: str, name: str, resume_text: str, transcript_text
         for tension in tensions:
             print(f"    -> Tension detected between {tension.agent_a.value} and {tension.agent_b.value}: {tension.tension_type.value}")
             time.sleep(5)
-            turn = run_debate_turn(tension, opinions, round_num)
-            turn = verify_evidence_on_turn(turn, resume_text + transcript_text)
             
-            # Sanitize turn evidence
-            turn.response_evidence = [ev for ev in turn.response_evidence if ev.verified]
-            debate_log.append(turn)
+            # Agent B responds to Agent A
+            turn_b = run_debate_turn(tension, opinions, round_num, target_agent=tension.agent_b, source_agent=tension.agent_a)
+            turn_b = verify_evidence_on_turn(turn_b, resume_text + transcript_text)
+            turn_b.response_evidence = [ev for ev in turn_b.response_evidence if ev.verified]
+            debate_log.append(turn_b)
             
-            if turn.new_verdict or turn.new_confidence:
-                print(f"      -> {turn.target_agent.value} revised opinion ({turn.response_type.value})")
-                opinions[turn.target_agent] = apply_revision(opinions[turn.target_agent], turn)
+            if turn_b.new_verdict or turn_b.new_confidence:
+                print(f"      -> {turn_b.target_agent.value} revised opinion ({turn_b.response_type.value})")
+                opinions[turn_b.target_agent] = apply_revision(opinions[turn_b.target_agent], turn_b)
                 any_revision = True
             else:
-                print(f"      -> {turn.target_agent.value} stood firm ({turn.response_type.value})")
+                print(f"      -> {turn_b.target_agent.value} stood firm ({turn_b.response_type.value})")
+                
+            time.sleep(5)
+            
+            # Agent A responds to Agent B
+            turn_a = run_debate_turn(tension, opinions, round_num, target_agent=tension.agent_a, source_agent=tension.agent_b)
+            turn_a = verify_evidence_on_turn(turn_a, resume_text + transcript_text)
+            turn_a.response_evidence = [ev for ev in turn_a.response_evidence if ev.verified]
+            debate_log.append(turn_a)
+            
+            if turn_a.new_verdict or turn_a.new_confidence:
+                print(f"      -> {turn_a.target_agent.value} revised opinion ({turn_a.response_type.value})")
+                opinions[turn_a.target_agent] = apply_revision(opinions[turn_a.target_agent], turn_a)
+                any_revision = True
+            else:
+                print(f"      -> {turn_a.target_agent.value} stood firm ({turn_a.response_type.value})")
                 
         if not any_revision:
             print("  -> No revisions made. Converged.")

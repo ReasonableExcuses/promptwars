@@ -1,0 +1,24 @@
+{
+  "candidate_id": "Candidate_A",
+  "recommendation": "hire",
+  "confidence": "high",
+  "weighting_rationale": [
+    {
+      "dimension": "Python",
+      "weight_class": "decisive",
+      "justification": "Important",
+      "jd_requirement_ref": "Must know Python"
+    }
+  ],
+  "strengths": [
+    {
+      "claim": "Good Python skills",
+      "quote": "I know Python.",
+      "source": "transcript",
+      "interpretation": "Shows Python skills",
+      "verified": true
+    }
+  ],
+  "concerns": [],
+  "unresolved_disagreements": []
+}

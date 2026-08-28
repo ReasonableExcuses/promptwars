@@ -1,0 +1,17 @@
+[
+  {
+    "turn_id": "t1",
+    "round": 1,
+    "tension_id": "ten1",
+    "source_agent": "technical",
+    "target_agent": "culture",
+    "source_claim": "Good Python skills",
+    "source_quote": "I know Python.",
+    "response_type": "concede",
+    "response_evidence": [],
+    "prior_verdict": "strong_hire",
+    "new_verdict": "hire",
+    "prior_confidence": "high",
+    "new_confidence": "medium"
+  }
+]
