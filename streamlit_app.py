@@ -252,7 +252,9 @@ with tabs[1]:
     st.markdown("### Cross-Examination & Debate")
     st.markdown("The Orchestrator detects tensions between independent opinions and forces the agents to debate and defend their claims.")
     
-    if not debate_log:
+    if debate_log is None:
+        st.warning("⚠️ **The debate log is missing.** This usually means the pipeline crashed halfway through (often due to Groq API rate limits) before it could finish the cross-examination phase. Please click 'Run End-to-End Pipeline' again.")
+    elif len(debate_log) == 0:
         st.success("No debates occurred. The agents converged immediately!")
     else:
         col1, col2 = st.columns([1, 2])
