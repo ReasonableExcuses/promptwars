@@ -1,7 +1,8 @@
 import streamlit as st
 import json
 import os
-import time
+import re
+from typing import Optional, Dict, List, Union
 
 # Create a minimal wrapper if running pipeline
 try:
@@ -102,6 +103,7 @@ st.markdown("""
         border-radius: 50%;
         box-shadow: 0 0 10px rgba(255, 107, 107, 0.6);
     }
+"""
     
     .agent-name {
         font-weight: 800;
@@ -112,11 +114,11 @@ st.markdown("""
 </style>
 """, unsafe_allow_html=True)
 
-st.markdown('<h1 class="main-title">Multi-Agent AI Interview Panel</h1>', unsafe_allow_html=True)
-st.markdown('<div class="subtitle">Simulating real-world debate among distinct AI personas with cross-examination.</div>', unsafe_allow_html=True)
+st.markdown('<header><h1 class="main-title" aria-label="Main Application Title">Multi-Agent AI Interview Panel</h1></header>', unsafe_allow_html=True)
+st.markdown('<div class="subtitle" role="doc-subtitle">Simulating real-world debate among distinct AI personas with cross-examination.</div>', unsafe_allow_html=True)
 
 # Sidebar
-st.sidebar.image("https://via.placeholder.com/400x150.png?text=PromptWars+Engine", use_container_width=True)
+st.sidebar.image("https://via.placeholder.com/400x150.png?text=PromptWars+Engine", use_container_width=True, alt="PromptWars Engine Logo")
 st.sidebar.header("⚙️ Configuration")
 mode = st.sidebar.radio("Run Mode", ["View Example (Offline)", "Live Run (Requires API Key)"])
 
@@ -127,22 +129,31 @@ if mode == "Live Run (Requires API Key)":
 
 candidate_options = {"Candidate A": "Candidate_A", "Candidate B": "Candidate_B"}
 selected_candidate_name = st.sidebar.selectbox("Select Candidate", list(candidate_options.keys()))
-cid = candidate_options[selected_candidate_name]
+
+def sanitize_filename(cid: str) -> str:
+    """Sanitizes candidate ID to prevent path traversal (LFI)."""
+    return re.sub(r'[^a-zA-Z0-9_-]', '', cid) or "unknown_candidate"
+
+cid = sanitize_filename(candidate_options[selected_candidate_name])
 
 # Helpers
-def load_json(filepath):
+@st.cache_data
+def load_json(filepath: str) -> Union[Dict, List, None]:
+    """Securely loads JSON from disk with caching for performance."""
     if os.path.exists(filepath):
         with open(filepath, "r", encoding="utf-8") as f:
             return json.load(f)
     return None
 
-def load_file(filepath):
+@st.cache_data
+def load_file(filepath: str) -> Optional[str]:
+    """Securely loads raw text files from disk with caching."""
     if os.path.exists(filepath):
         with open(filepath, "r", encoding="utf-8") as f:
             return f.read()
     return None
 
-def run_live_pipeline(cid_key):
+def run_live_pipeline(cid_key: str) -> None:
     if not os.environ.get("GROQ_API_KEY"):
         st.sidebar.error("Please provide a Groq API Key.")
         return
@@ -213,14 +224,14 @@ with tabs[0]:
                 st.metric(label=f"{icon} {agent_key.replace('_', ' ').title()}", value=f"{conf.upper()} ({score}/100)", delta=verdict.upper().replace("_", " "), delta_color="off")
                 
                 # Use raw HTML for the beautiful pill styling underneath
-                st.markdown(f'<div class="verdict-pill {verdict}">{verdict.replace("_", " ")}</div>', unsafe_allow_html=True)
+                st.markdown(f'<div class="verdict-pill {verdict}" role="status" aria-label="Verdict: {verdict}">{verdict.replace("_", " ")}</div>', unsafe_allow_html=True)
                 
                 with st.expander("View Evidence (Verification Check)", expanded=True):
                     for ev in op.get('evidence', [])[:3]:
                         if ev.get("verified"):
-                            st.markdown(f'<div style="border-left: 4px solid #4ade80; padding-left: 12px; margin-bottom: 12px; font-size: 0.95rem;">✅ <strong>VERIFIED SOURCE:</strong><br/><em>"{ev.get("quote")}"</em><br/><span style="color:#a0aec0; font-size: 0.85rem;">Interpretation: {ev.get("interpretation")}</span></div>', unsafe_allow_html=True)
+                            st.markdown(f'<article aria-label="Verified Source Evidence" style="border-left: 4px solid #4ade80; padding-left: 12px; margin-bottom: 12px; font-size: 0.95rem;">✅ <strong>VERIFIED SOURCE:</strong><br/><em>"{ev.get("quote")}"</em><br/><span style="color:#a0aec0; font-size: 0.85rem;">Interpretation: {ev.get("interpretation")}</span></article>', unsafe_allow_html=True)
                         else:
-                            st.markdown(f'<div style="border-left: 4px solid #f87171; padding: 12px; margin-bottom: 12px; background: rgba(248,113,113,0.1); border-radius: 4px; font-size: 0.95rem;">❌ <strong>HALLUCINATION DETECTED</strong><br/><span style="color:#f87171;">Agent hallucinates quote not present in source text:</span><br/><em>"{ev.get("quote")}"</em></div>', unsafe_allow_html=True)
+                            st.markdown(f'<article aria-label="Hallucinated Evidence Error" role="alert" style="border-left: 4px solid #f87171; padding: 12px; margin-bottom: 12px; background: rgba(248,113,113,0.1); border-radius: 4px; font-size: 0.95rem;">❌ <strong>HALLUCINATION DETECTED</strong><br/><span style="color:#f87171;">Agent hallucinates quote not present in source text:</span><br/><em>"{ev.get("quote")}"</em></article>', unsafe_allow_html=True)
             else:
                 st.info(f"{icon} No data.")
 
@@ -233,7 +244,7 @@ with tabs[1]:
         st.success("No debates occurred. The agents converged immediately!")
     else:
         # Create HTML timeline
-        timeline_html = '<div class="timeline-container">'
+        timeline_html = '<section class="timeline-container" aria-label="Debate Timeline">'
         
         for turn in debate_log:
             rd = turn.get('round', 1)
@@ -249,19 +260,19 @@ with tabs[1]:
             
             verdict_shift = ""
             if new_v and new_v != turn.get('prior_verdict'):
-                verdict_shift = f'<div style="margin-top: 10px; padding: 10px; background: rgba(0,0,0,0.2); border-radius: 5px;"><strong>Verdict Shift:</strong> <s>{prior_v}</s> ➡️ <span style="color: #4ECDC4;">{new_v.upper()}</span></div>'
+                verdict_shift = f'<div style="margin-top: 10px; padding: 10px; background: rgba(0,0,0,0.2); border-radius: 5px;" role="status" aria-label="Verdict Shift"><strong>Verdict Shift:</strong> <s>{prior_v}</s> ➡️ <span style="color: #4ECDC4;">{new_v.upper()}</span></div>'
             
             node_html = f"""
-            <div class="timeline-node">
+            <article class="timeline-node" aria-label="Debate Turn">
                 <div style="font-size: 0.8rem; color: #a0aec0; margin-bottom: 5px;">ROUND {rd} TENSION</div>
                 <div><span class="agent-name">{src}</span> claimed: <em>"{claim}"</em></div>
                 <div style="margin-top: 10px;"><span class="agent-name">{tgt}</span> responded: {resp_span}</div>
                 {verdict_shift}
-            </div>
+            </article>
             """
             timeline_html += node_html
             
-        timeline_html += '</div>'
+        timeline_html += '</section>'
         st.markdown(timeline_html, unsafe_allow_html=True)
 
 # TAB 3: Final Report
@@ -283,7 +294,7 @@ with tabs[3]:
                 rec = dec.get('recommendation', 'unknown')
                 
                 # Pill for final decision
-                st.markdown(f'<div class="verdict-pill {rec}">{rec.upper()}</div>', unsafe_allow_html=True)
+                st.markdown(f'<div class="verdict-pill {rec}" role="status" aria-label="Final Recommendation: {rec}">{rec.upper()}</div>', unsafe_allow_html=True)
                 st.write("")
                 
                 with st.expander("Key Strengths", expanded=True):

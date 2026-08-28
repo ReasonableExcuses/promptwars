@@ -1,7 +1,9 @@
 import os
 import json
-import time
 import traceback
+import re
+import concurrent.futures
+from typing import Callable, Optional, Dict, List
 from src.schemas import AgentRole
 from src.profile_builder import build_profile
 from src.agents.runner import call_agent
@@ -12,6 +14,10 @@ from src.decision_synthesizer import call_decision_synthesizer
 from src.report_renderer import render_final_report
 
 MAX_ROUNDS = 2
+
+def sanitize_filename(cid: str) -> str:
+    """Sanitizes candidate ID to prevent path traversal (LFI)."""
+    return re.sub(r'[^a-zA-Z0-9_-]', '', cid) or "unknown_candidate"
 
 def sanitize_unverified_evidence(opinion):
     """Moves unverified evidence to insufficient_info_flags"""
@@ -24,8 +30,10 @@ def sanitize_unverified_evidence(opinion):
     opinion.evidence = valid_evidence
     return opinion
 
-def run_pipeline(candidate_id: str, name: str, resume_text: str, transcript_text: str, jd_text: str, progress_callback=None) -> str:
-    def log(msg):
+def run_pipeline(candidate_id: str, name: str, resume_text: str, transcript_text: str, jd_text: str, progress_callback: Optional[Callable[[str], None]] = None) -> str:
+    candidate_id = sanitize_filename(candidate_id)
+    
+    def log(msg: str) -> None:
         if progress_callback:
             progress_callback(msg)
         else:
@@ -41,16 +49,22 @@ def run_pipeline(candidate_id: str, name: str, resume_text: str, transcript_text
     with open(f"runs/{candidate_id}_profile.json", "w", encoding="utf-8") as f:
         f.write(profile.model_dump_json(indent=2))
 
-    log(f"🤖 **Phase 2:** Collecting Independent Opinions...")
+    log(f"🤖 **Phase 2:** Collecting Independent Opinions (Parallelizing Requests)...")
     opinions = {}
-    for role in [AgentRole.technical, AgentRole.culture, AgentRole.hiring_manager, AgentRole.skeptic]:
+    
+    def fetch_opinion(role: AgentRole):
         log(f"  ↳ Booting `{role.value.upper()}` agent...")
-        time.sleep(5)
         raw_opinion = call_agent(role, profile, resume_text, transcript_text, jd_text)
         raw_opinion.candidate_id = candidate_id
-        
         verified_opinion = verify_evidence(raw_opinion, resume_text + transcript_text)
-        opinions[role] = sanitize_unverified_evidence(verified_opinion)
+        return role, sanitize_unverified_evidence(verified_opinion)
+        
+    roles = [AgentRole.technical, AgentRole.culture, AgentRole.hiring_manager, AgentRole.skeptic]
+    with concurrent.futures.ThreadPoolExecutor(max_workers=4) as executor:
+        futures = {executor.submit(fetch_opinion, r): r for r in roles}
+        for future in concurrent.futures.as_completed(futures):
+            role, opinion = future.result()
+            opinions[role] = opinion
 
     # Persist round 0 opinions
     with open(f"runs/{candidate_id}_opinions_round0.json", "w", encoding="utf-8") as f:
@@ -73,7 +87,6 @@ def run_pipeline(candidate_id: str, name: str, resume_text: str, transcript_text
             gap = abs(a_conf - b_conf)
             log(f"⚡ **TENSION DETECTED:** {tension.agent_a.value.upper()} vs {tension.agent_b.value.upper()}")
             log(f"  ↳ Type: {tension.tension_type.value} | Disagreement Magnitude: **{gap} points**")
-            time.sleep(5)
             
             # Agent B responds to Agent A
             turn_b = run_debate_turn(tension, opinions, round_num, target_agent=tension.agent_b, source_agent=tension.agent_a)
@@ -87,8 +100,6 @@ def run_pipeline(candidate_id: str, name: str, resume_text: str, transcript_text
                 any_revision = True
             else:
                 log(f"  ↳ {turn_b.target_agent.value.upper()} **{turn_b.response_type.value.upper()}** (Stood firm)")
-                
-            time.sleep(5)
             
             # Agent A responds to Agent B
             turn_a = run_debate_turn(tension, opinions, round_num, target_agent=tension.agent_a, source_agent=tension.agent_b)
@@ -119,7 +130,6 @@ def run_pipeline(candidate_id: str, name: str, resume_text: str, transcript_text
         json.dump([t.model_dump() for t in debate_log], f, indent=2)
 
     log(f"⚖️ **Phase 4:** Synthesizing Final Decision (Chair Agent)...")
-    time.sleep(5)
     try:
         decision = call_decision_synthesizer(jd_text, opinions, debate_log, tensions)
     except Exception as e:

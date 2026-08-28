@@ -1,6 +1,6 @@
 from enum import Enum
 from typing import Optional
-from pydantic import BaseModel
+from pydantic import BaseModel, Field
 
 class VerificationStatus(str, Enum):
     verified = "verified"                    # formally measured

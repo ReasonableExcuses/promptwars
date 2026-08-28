@@ -34,7 +34,12 @@ graph TD
 - **Free Execution**: Uses the `instructor` library with `Groq` to execute highly-structured JSON LLM calls entirely for free using open-source models (`openai/gpt-oss-120b`).
 
 ## 🛠️ Installation & Usage
-### 1. Web Application (Recommended)
+
+### 🚀 Live Demo
+Experience the live **PromptWars Adjudication Engine** deployed on Streamlit Cloud:  
+👉 [https://abhinavppm-propmtwars.streamlit.app/](https://abhinavppm-propmtwars.streamlit.app/)
+
+### 1. Web Application (Local Execution)
 You can deploy and run the stunning GUI locally using Streamlit.
 ```bash
 python -m venv venv
