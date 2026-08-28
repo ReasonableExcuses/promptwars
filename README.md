@@ -4,7 +4,12 @@ This project is an advanced multi-agent evaluation system designed to simulate a
 
 ## Features
 
-- **Profile Building**: Extracts factual claims, timelines, and skills from a candidate's resume and interview transcript.
+![Screenshot of the Independent Opinions View](https://via.placeholder.com/800x400.png?text=Independent+Opinions)
+![Screenshot of the Debate Timeline](https://via.placeholder.com/800x400.png?text=Debate+Timeline)
+![Screenshot of Final Report](https://via.placeholder.com/800x400.png?text=Final+Report)
+
+- **Interactive UI**: Fully functional frontend powered by Streamlit, parsing all Pydantic schemas seamlessly.
+- **Profile Building**: Extracts factual claims, timelines, and skills from a candidate's resume and transcript.
 - **Independent Agent Personas**: Uses four distinct personas (Technical, Culture, Hiring Manager, Skeptic) to form initial independent opinions without shared context.
 - **Evidence Verification**: Validates all agent quotes against the source documents using fuzzy string matching, preventing AI hallucinations.
 - **Tension Detection & Debate Engine**: Automatically detects contradictions or disagreements between agents and forces them to debate specific claims, leading to revisions or concessions.
@@ -30,21 +35,29 @@ This project is an advanced multi-agent evaluation system designed to simulate a
    source venv/bin/activate      # Mac/Linux
    ```
 
-2. Install dependencies:
+2. Install core dependencies (CLI only):
    ```bash
    pip install -r requirements.txt
    ```
 
-3. Set your Groq API Key:
+   **OR install GUI dependencies** (Recommended):
    ```bash
-   $env:GROQ_API_KEY="gsk_..."
+   pip install -r requirements-gui.txt
    ```
 
 ## Usage
 
-Run the end-to-end pipeline via the CLI application:
-
+### 🖥️ Streamlit GUI (Recommended)
+You can explore the offline `examples/` dataset or run a live simulation from the web interface.
 ```bash
+streamlit run streamlit_app.py
+```
+
+### 💻 CLI Pipeline
+Run the end-to-end pipeline via the CLI application.
+Make sure your API key is in the environment:
+```bash
+$env:GROQ_API_KEY="gsk_..."
 python app.py --candidate ALL
 ```
 
