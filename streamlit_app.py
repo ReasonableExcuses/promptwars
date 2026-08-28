@@ -311,7 +311,7 @@ with tabs[2]:
     if final_report:
         st.markdown(final_report)
     else:
-        st.info("Final report not generated yet.")
+        st.warning("⚠️ **Final report missing.** The pipeline likely crashed (due to API rate limits or errors) before it could synthesize the final decision. Please click 'Run End-to-End Pipeline' again.")
 
 # TAB 4: Compare Candidates
 with tabs[3]:
