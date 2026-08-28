@@ -298,11 +298,14 @@ with tabs[2]:
 with tabs[3]:
     st.markdown("### Executive Summary")
     comp_cols = st.columns(len(candidate_options))
+    valid_decisions = {}
+    
     for idx, (name, key) in enumerate(candidate_options.items()):
         with comp_cols[idx]:
             st.subheader(name)
             dec = load_json(f"{data_dir}/{key}_decision.json")
             if dec:
+                valid_decisions[name] = dec
                 rec = dec.get('recommendation', 'unknown')
                 
                 # Pill for final decision
@@ -318,3 +321,34 @@ with tabs[3]:
                         st.markdown(f"- {ev.get('claim')}")
             else:
                 st.write("No decision available.")
+
+    st.divider()
+    st.markdown("### ⚖️ VP of Engineering - Comparative Ranking")
+    if len(valid_decisions) >= 2:
+        if st.button("▶️ Run Comparative Analysis", type="primary", use_container_width=True):
+            try:
+                from src.agents.runner import call_comparator
+            except ImportError:
+                st.error("Could not import runner. Ensure you are running locally or the backend is configured.")
+            else:
+                jd = load_file("data/job_description.txt")
+                if jd:
+                    with st.spinner("VP of Engineering is analyzing the trade-offs..."):
+                        try:
+                            comp_report = call_comparator(jd, valid_decisions)
+                            
+                            winner = comp_report.recommended_winner
+                            st.success(f"**Recommended Winner:** {winner if winner else 'Tie / Depends on Priorities'}")
+                            
+                            st.markdown("#### Tradeoff Summary")
+                            st.info(comp_report.tradeoff_summary)
+                            
+                            st.markdown("#### Candidate Advantages")
+                            for c_name, adv in comp_report.candidate_advantages.items():
+                                st.markdown(f"- **{c_name}:** {adv}")
+                        except Exception as e:
+                            st.error(f"Comparator Error: {e}")
+                else:
+                    st.error("Could not load Job Description.")
+    else:
+        st.info("Run the pipeline for at least two candidates to unlock Comparative Ranking.")

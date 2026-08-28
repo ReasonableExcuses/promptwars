@@ -2,7 +2,7 @@ import os
 import json
 import instructor
 from groq import Groq
-from src.schemas import AgentOpinion, AgentRole, CandidateProfile
+from src.schemas import AgentOpinion, AgentRole, CandidateProfile, ComparisonReport
 
 SHARED_RULES = """
 You must ground every claim in your evidence list with a verbatim quote from the
@@ -67,6 +67,43 @@ def call_agent(role: AgentRole, profile: CandidateProfile, resume_text: str, tra
         except Exception as e:
             if "429" in str(e) or "rate_limit" in str(e).lower():
                 print(f"Rate limit hit in runner. Sleeping 15s... ({attempt+1}/5)")
+                time.sleep(15)
+            else:
+                raise e
+    raise Exception("Max retries exceeded due to rate limits.")
+
+def call_comparator(jd_text: str, decisions: dict) -> ComparisonReport:
+    """
+    Issues a call to the VP of Engineering agent to compare multiple candidates.
+    decisions is a dict mapping candidate_id to their FinalDecision dict.
+    """
+    api_key = os.environ.get("GROQ_API_KEY")
+    client = instructor.from_groq(Groq(api_key=api_key), mode=instructor.Mode.JSON)
+    
+    path = os.path.join(os.path.dirname(__file__), "prompts", "comparator.md")
+    with open(path, "r", encoding="utf-8") as f:
+        system_prompt = f.read().strip()
+        
+    user_message = f"=== JOB DESCRIPTION ===\n{jd_text}\n\n"
+    for cid, dec in decisions.items():
+        user_message += f"=== CANDIDATE {cid} FINAL DECISION ===\n{json.dumps(dec, indent=2)}\n\n"
+
+    import time
+    for attempt in range(5):
+        try:
+            report: ComparisonReport = client.chat.completions.create(
+                model="openai/gpt-oss-120b",
+                messages=[
+                    {"role": "system", "content": system_prompt},
+                    {"role": "user", "content": user_message}
+                ],
+                response_model=ComparisonReport,
+                temperature=0.0
+            )
+            return report
+        except Exception as e:
+            if "429" in str(e) or "rate_limit" in str(e).lower():
+                print(f"Rate limit hit in comparator. Sleeping 15s... ({attempt+1}/5)")
                 time.sleep(15)
             else:
                 raise e

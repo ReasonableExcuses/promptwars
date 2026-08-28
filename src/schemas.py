@@ -162,3 +162,8 @@ class FinalDecision(BaseModel):
     strengths: list[EvidenceItem]
     concerns: list[EvidenceItem]
     unresolved_disagreements: list[UnresolvedDisagreement]
+
+class ComparisonReport(BaseModel):
+    tradeoff_summary: str = Field(description="Executive summary of the business tradeoff between these specific candidates.")
+    recommended_winner: Optional[str] = Field(default=None, description="The name or ID of the winner, if one is clearly better. If it's a tie or depends strictly on team priorities, return null.")
+    candidate_advantages: dict[str, str] = Field(description="A dictionary mapping the candidate ID to a summary of what they do better than the others.")
