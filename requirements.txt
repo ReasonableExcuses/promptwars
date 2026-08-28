@@ -4,3 +4,4 @@ pytest
 openai
 groq
 instructor
+gTTS

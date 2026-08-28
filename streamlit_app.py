@@ -255,6 +255,23 @@ with tabs[1]:
     if not debate_log:
         st.success("No debates occurred. The agents converged immediately!")
     else:
+        col1, col2 = st.columns([1, 2])
+        with col1:
+            st.markdown("#### 🗣️ Voice Debate Session")
+            st.markdown("Listen to the AI personas argue their points using distinct regional accents (powered by gTTS).")
+            if st.button("Generate & Play Audio", type="primary", key=f"audio_{cid}"):
+                try:
+                    from src.voice_synthesizer import generate_debate_audio
+                    with st.spinner("Generating distinct voices for AI personas..."):
+                        audio_path = os.path.join(data_dir, f"{cid}_debate.mp3")
+                        generate_debate_audio(debate_log, audio_path)
+                        st.audio(audio_path, format="audio/mp3")
+                except ImportError:
+                    st.error("gTTS is not installed or voice synthesizer module is missing.")
+                except Exception as e:
+                    st.error(f"Voice synthesis failed: {e}")
+        st.divider()
+        
         # Create HTML timeline
         timeline_html = '<section class="timeline-container" aria-label="Debate Timeline">'
         
