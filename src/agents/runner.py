@@ -48,14 +48,23 @@ def call_agent(role: AgentRole, profile: CandidateProfile, resume_text: str, tra
 {transcript_text}
 """
 
-    response = client.chat.completions.create(
-        model="openai/gpt-oss-120b",
-        messages=[
-            {"role": "system", "content": system_prompt},
-            {"role": "user", "content": user_message}
-        ],
-        response_model=AgentOpinion,
-        temperature=0.0
-    )
-
-    return response
+    import time
+    for attempt in range(5):
+        try:
+            opinion: AgentOpinion = client.chat.completions.create(
+                model="openai/gpt-oss-120b",
+                messages=[
+                    {"role": "system", "content": system_prompt},
+                    {"role": "user", "content": user_message}
+                ],
+                response_model=AgentOpinion,
+                temperature=0.0
+            )
+            return opinion
+        except Exception as e:
+            if "429" in str(e) or "rate_limit" in str(e).lower():
+                print(f"Rate limit hit in runner. Sleeping 15s... ({attempt+1}/5)")
+                time.sleep(15)
+            else:
+                raise e
+    raise Exception("Max retries exceeded due to rate limits.")

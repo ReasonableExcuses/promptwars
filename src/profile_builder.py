@@ -46,14 +46,23 @@ Output must validate against the CandidateProfile schema. Return JSON only."""
 {transcript_text}
 """
 
-    response = client.chat.completions.create(
-        model="openai/gpt-oss-120b",
-        messages=[
-            {"role": "system", "content": system_prompt},
-            {"role": "user", "content": user_message}
-        ],
-        response_model=CandidateProfile,
-        temperature=0.0
-    )
-
-    return response
+    import time
+    for attempt in range(5):
+        try:
+            profile: CandidateProfile = client.chat.completions.create(
+                model="openai/gpt-oss-120b",
+                messages=[
+                    {"role": "system", "content": system_prompt},
+                    {"role": "user", "content": user_message}
+                ],
+                response_model=CandidateProfile,
+                temperature=0.0
+            )
+            return profile
+        except Exception as e:
+            if "429" in str(e) or "rate_limit" in str(e).lower():
+                print(f"Rate limit hit in profile builder. Sleeping 15s... ({attempt+1}/5)")
+                time.sleep(15)
+            else:
+                raise e
+    raise Exception("Max retries exceeded due to rate limits.")

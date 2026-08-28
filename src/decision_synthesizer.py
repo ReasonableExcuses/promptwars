@@ -57,17 +57,27 @@ def call_decision_synthesizer(jd_text: str, opinions_dict: dict, debate_log: lis
 {"\n---\n".join(unresolved_tensions_json)}
 """
 
-    decision: FinalDecision = client.chat.completions.create(
-        model="openai/gpt-oss-120b",
-        messages=[
-            {"role": "system", "content": SYNTHESIZER_SYSTEM_PROMPT},
-            {"role": "user", "content": user_message}
-        ],
-        response_model=FinalDecision,
-        temperature=0.0
-    )
-    # Assuming opinions all share the same candidate_id
-    if opinions_dict:
-        decision.candidate_id = list(opinions_dict.values())[0].candidate_id
-        
-    return decision
+    import time
+    for attempt in range(5):
+        try:
+            decision: FinalDecision = client.chat.completions.create(
+                model="openai/gpt-oss-120b",
+                messages=[
+                    {"role": "system", "content": SYNTHESIZER_SYSTEM_PROMPT},
+                    {"role": "user", "content": user_message}
+                ],
+                response_model=FinalDecision,
+                temperature=0.0
+            )
+            # Assuming opinions all share the same candidate_id
+            if opinions_dict:
+                decision.candidate_id = list(opinions_dict.values())[0].candidate_id
+                
+            return decision
+        except Exception as e:
+            if "429" in str(e) or "rate_limit" in str(e).lower():
+                print(f"Rate limit hit in decision synthesizer. Sleeping 15s... ({attempt+1}/5)")
+                time.sleep(15)
+            else:
+                raise e
+    raise Exception("Max retries exceeded due to rate limits.")

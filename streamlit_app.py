@@ -101,7 +101,7 @@ with tab1:
                 op = opinions_round0[agent]
                 
                 verdict_colors = {
-                    "strong_hire": "green", "hire": "blue", "lean_hire": "lightblue",
+                    "strong_hire": "green", "hire": "green", "lean_hire": "blue",
                     "lean_no_hire": "orange", "no_hire": "red", "insufficient_data": "gray"
                 }
                 color = verdict_colors.get(op.get('verdict'), 'gray')

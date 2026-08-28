@@ -60,28 +60,38 @@ def run_debate_turn(tension: Tension, opinions_dict: dict, round_num: int, targe
 {target_opinion.model_dump_json(indent=2)}
 """
 
-    turn: DebateTurn = client.chat.completions.create(
-        model="openai/gpt-oss-120b",
-        messages=[
-            {"role": "system", "content": system_prompt},
-            {"role": "user", "content": user_message}
-        ],
-        response_model=DebateTurn,
-        temperature=0.0
-    )
-    turn.turn_id = str(uuid.uuid4())
-    turn.round = round_num
-    turn.tension_id = tension.tension_id
-    turn.source_agent = source_agent
-    turn.target_agent = target_agent
-    turn.source_claim = tension.claim_a
-    turn.source_quote = source_quote
-    
-    # Override prior states to ensure consistency
-    turn.prior_verdict = target_opinion.verdict
-    turn.prior_confidence = target_opinion.confidence
-
-    return turn
+    import time
+    for attempt in range(5):
+        try:
+            turn: DebateTurn = client.chat.completions.create(
+                model="openai/gpt-oss-120b",
+                messages=[
+                    {"role": "system", "content": system_prompt},
+                    {"role": "user", "content": user_message}
+                ],
+                response_model=DebateTurn,
+                temperature=0.0
+            )
+            turn.turn_id = str(uuid.uuid4())
+            turn.round = round_num
+            turn.tension_id = tension.tension_id
+            turn.source_agent = source_agent
+            turn.target_agent = target_agent
+            turn.source_claim = tension.claim_a
+            turn.source_quote = source_quote
+            
+            # Override prior states to ensure consistency
+            turn.prior_verdict = target_opinion.verdict
+            turn.prior_confidence = target_opinion.confidence
+        
+            return turn
+        except Exception as e:
+            if "429" in str(e) or "rate_limit" in str(e).lower():
+                print(f"Rate limit hit in debate engine. Sleeping 15s... ({attempt+1}/5)")
+                time.sleep(15)
+            else:
+                raise e
+    raise Exception("Max retries exceeded due to rate limits.")
 
 def apply_revision(opinion: AgentOpinion, turn: DebateTurn) -> AgentOpinion:
     """
