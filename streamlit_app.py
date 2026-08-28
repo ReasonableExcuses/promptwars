@@ -117,7 +117,7 @@ st.markdown('<header><h1 class="main-title" aria-label="Main Application Title">
 st.markdown('<div class="subtitle" role="doc-subtitle">Simulating real-world debate among distinct AI personas with cross-examination.</div>', unsafe_allow_html=True)
 
 # Sidebar
-st.sidebar.image("https://via.placeholder.com/400x150.png?text=PromptWars+Engine", use_container_width=True, alt="PromptWars Engine Logo")
+st.sidebar.image("https://via.placeholder.com/400x150.png?text=PromptWars+Engine", use_container_width=True)
 st.sidebar.header("⚙️ Configuration")
 mode = st.sidebar.radio("Run Mode", ["View Example (Offline)", "Live Run (Requires API Key)"])
 
