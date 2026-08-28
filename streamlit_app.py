@@ -127,6 +127,8 @@ if mode == "Live Run (Requires API Key)":
         os.environ["GROQ_API_KEY"] = api_key
 
 candidate_options = {"Candidate A": "Candidate_A", "Candidate B": "Candidate_B"}
+if mode == "Live Run (Requires API Key)":
+    candidate_options["✨ Custom Input"] = "Custom_Candidate"
 selected_candidate_name = st.sidebar.selectbox("Select Candidate", list(candidate_options.keys()))
 
 def sanitize_filename(cid: str) -> str:
@@ -152,15 +154,15 @@ def load_file(filepath: str) -> Optional[str]:
             return f.read()
     return None
 
-def run_live_pipeline(cid_key: str) -> None:
+def run_live_pipeline(cid_key: str, custom_resume: Optional[str] = None, custom_transcript: Optional[str] = None, custom_jd: Optional[str] = None) -> None:
     if not os.environ.get("GROQ_API_KEY"):
         st.sidebar.error("Please provide a Groq API Key.")
         return
         
     with st.status(f"🚀 Running orchestration pipeline for {cid_key}...", expanded=True) as status:
-        resume = load_file(f"data/{cid_key.lower()}_resume.txt")
-        transcript = load_file(f"data/{cid_key.lower()}_transcript.txt")
-        jd = load_file(f"data/job_description.txt")
+        resume = custom_resume or load_file(f"data/{cid_key.lower()}_resume.txt")
+        transcript = custom_transcript or load_file(f"data/{cid_key.lower()}_transcript.txt")
+        jd = custom_jd or load_file(f"data/job_description.txt")
         
         def progress_callback(msg):
             st.write(msg)
@@ -179,9 +181,21 @@ def run_live_pipeline(cid_key: str) -> None:
             status.update(label=f"❌ Pipeline Failed: {e}", state="error")
             st.error(str(e))
 
+custom_jd, custom_resume, custom_transcript = None, None, None
+if cid == "Custom_Candidate":
+    st.markdown("### 📝 Custom Input Data")
+    st.info("💡 Paste your custom text below, then click **▶️ Run End-to-End Pipeline** in the sidebar to test the engine on your own data.")
+    custom_jd = st.text_area("Job Description", placeholder="Paste Job Description here...", height=200)
+    custom_resume = st.text_area("Candidate Resume", placeholder="Paste Resume here...", height=200)
+    custom_transcript = st.text_area("Interview Transcript", placeholder="Paste Interview Transcript here...", height=200)
+    st.divider()
+
 if mode == "Live Run (Requires API Key)":
     if st.sidebar.button("▶️ Run End-to-End Pipeline", type="primary", use_container_width=True):
-        run_live_pipeline(cid)
+        if cid == "Custom_Candidate" and not (custom_jd and custom_resume and custom_transcript):
+            st.sidebar.error("Please fill all custom input fields!")
+        else:
+            run_live_pipeline(cid, custom_resume, custom_transcript, custom_jd)
 
 # Load Data
 data_dir = "examples" if mode == "View Example (Offline)" else "runs"
