@@ -1,5 +1,5 @@
 Ananya Iyer
-Software Engineer (Backend → AI)
+Software Engineer (Backend â†’ AI)
 
 Summary
 Backend engineer with steady experience maintaining internal tools, recently
@@ -7,7 +7,7 @@ moved into applied AI work. Comfortable with Python and standard web APIs; still
 building depth in AI-specific tooling.
 
 Experience
-Software Engineer II — Bridgepoint Systems (Jun 2021 – Present, 4 years)
+Software Engineer II â€” Bridgepoint Systems (Jun 2021 â€“ Present, 4 years)
 - Maintains Python/FastAPI microservices for an internal ops platform used by a
   few internal teams.
 - Helped migrate part of the document ingestion pipeline to use OCR-based
@@ -18,7 +18,7 @@ Software Engineer II — Bridgepoint Systems (Jun 2021 – Present, 4 years)
 - After a production incident (see interview), introduced a pre-deploy checklist
   for prompt changes that the team adopted.
 
-Junior Backend Developer — Bridgepoint Systems (Jul 2019 – Jun 2021, 2 years)
+Junior Backend Developer â€” Bridgepoint Systems (Jul 2019 â€“ Jun 2021, 2 years)
 - Built basic REST APIs for internal tooling.
 - Worked with QA and product to define API contracts.
 
@@ -31,4 +31,4 @@ B.E. Information Technology, 2019
 
 Note
 Has not used multi-agent orchestration frameworks (LangGraph, CrewAI, AutoGen) in
-production — most LLM work to date has been a single-agent RAG pipeline.
+production â€” most LLM work to date has been a single-agent RAG pipeline.

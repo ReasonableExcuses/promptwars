@@ -38,7 +38,7 @@ def run_pipeline(candidate_id: str, name: str, resume_text: str, transcript_text
 
     # Persist profile
     os.makedirs("runs", exist_ok=True)
-    with open(f"runs/{candidate_id}_profile.json", "w") as f:
+    with open(f"runs/{candidate_id}_profile.json", "w", encoding="utf-8") as f:
         f.write(profile.model_dump_json(indent=2))
 
     log(f"[{candidate_id}] Collecting independent opinions...")
@@ -53,7 +53,7 @@ def run_pipeline(candidate_id: str, name: str, resume_text: str, transcript_text
         opinions[role] = sanitize_unverified_evidence(verified_opinion)
 
     # Persist round 0 opinions
-    with open(f"runs/{candidate_id}_opinions_round0.json", "w") as f:
+    with open(f"runs/{candidate_id}_opinions_round0.json", "w", encoding="utf-8") as f:
         json.dump({k.value: v.model_dump() for k, v in opinions.items()}, f, indent=2)
 
     debate_log = []
@@ -107,9 +107,9 @@ def run_pipeline(candidate_id: str, name: str, resume_text: str, transcript_text
     tensions = detect_tensions(list(opinions.values()))
 
     # Persist final opinions and debate log
-    with open(f"runs/{candidate_id}_opinions.json", "w") as f:
+    with open(f"runs/{candidate_id}_opinions.json", "w", encoding="utf-8") as f:
         json.dump({k.value: v.model_dump() for k, v in opinions.items()}, f, indent=2)
-    with open(f"runs/{candidate_id}_debate_log.json", "w") as f:
+    with open(f"runs/{candidate_id}_debate_log.json", "w", encoding="utf-8") as f:
         json.dump([t.model_dump() for t in debate_log], f, indent=2)
 
     log(f"[{candidate_id}] Synthesizing final decision...")
@@ -121,12 +121,12 @@ def run_pipeline(candidate_id: str, name: str, resume_text: str, transcript_text
         traceback.print_exc()
         return "Failed to synthesize decision."
         
-    with open(f"runs/{candidate_id}_decision.json", "w") as f:
+    with open(f"runs/{candidate_id}_decision.json", "w", encoding="utf-8") as f:
         f.write(decision.model_dump_json(indent=2))
 
     report = render_final_report(decision, profile, opinions, debate_log)
     
-    with open(f"runs/{candidate_id}_final_report.md", "w") as f:
+    with open(f"runs/{candidate_id}_final_report.md", "w", encoding="utf-8") as f:
         f.write(report)
         
     log(f"[{candidate_id}] Done.")

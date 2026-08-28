@@ -29,13 +29,13 @@ cid = candidate_options[selected_candidate_name]
 # Helper to load JSON
 def load_json(filepath):
     if os.path.exists(filepath):
-        with open(filepath, "r") as f:
+        with open(filepath, "r", encoding="utf-8") as f:
             return json.load(f)
     return None
 
 def load_file(filepath):
     if os.path.exists(filepath):
-        with open(filepath, "r") as f:
+        with open(filepath, "r", encoding="utf-8") as f:
             return f.read()
     return None
 

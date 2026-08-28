@@ -6,7 +6,7 @@ A1: It's planner-executor-reviewer. Failures come in, get classified, retried or
 escalated, then double-checked. I designed the whole retry/escalation logic.
 
 Q2: What made you choose that structure over a simpler rule-based system?
-A2: Rules don't scale. Too many failure types — timeouts, bad EDI, missing BOL
+A2: Rules don't scale. Too many failure types â€” timeouts, bad EDI, missing BOL
 fields. Agents handle that better.
 
 Q3: How do you measure whether the reviewer agent is actually catching real
@@ -31,7 +31,7 @@ was the architect.
 
 Q7 (Skeptic follow-up): Your resume says "sole architect." But it sounds like
 Priya built a lot of it. Can you clarify?
-A7: Fine — "sole architect" is probably too strong. I led the design, she built
+A7: Fine â€” "sole architect" is probably too strong. I led the design, she built
 most of the production version.
 
 Ownership / Hiring Manager Section

@@ -1,9 +1,9 @@
-# Candidate Report — Rohan Malhotra (Candidate_A)
+# Candidate Report â€” Rohan Malhotra (Candidate_A)
 
 ## Recommendation: hire  (confidence: high)
 
 ## Strengths
-- Good Python skills — "I know Python." (transcript)
+- Good Python skills â€” "I know Python." (transcript)
 
 ## Concerns
 
@@ -11,7 +11,7 @@
 - **Python** [decisive]: Important (JD ref: Must know Python)
 
 ## Unresolved disagreements
-- None — all raised tensions were resolved during debate.
+- None â€” all raised tensions were resolved during debate.
 
 ## Full audit trail
 - Candidate profile: runs/Candidate_A_profile.json

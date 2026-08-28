@@ -7,7 +7,7 @@ Python backends. Led design of a production agent platform now handling thousand
 of daily freight exceptions. Known for moving fast and shipping under pressure.
 
 Experience
-Senior AI Engineer — Voltrix Logistics Tech (Jan 2025 – Present, 7 months)
+Senior AI Engineer â€” Voltrix Logistics Tech (Jan 2025 â€“ Present, 7 months)
 - Designed and built the exception-handling engine end-to-end for Voltrix's
   multi-agent freight ops platform (planner/executor/reviewer pattern), cutting
   manual exception review time by 40%.
@@ -17,12 +17,12 @@ Senior AI Engineer — Voltrix Logistics Tech (Jan 2025 – Present, 7 months)
   handling 5,000+ freight exceptions/month.
 - Presented the system design at a company-wide tech talk.
 
-AI Engineer — Quickship Data Systems (Feb 2024 – Dec 2024, 11 months)
+AI Engineer â€” Quickship Data Systems (Feb 2024 â€“ Dec 2024, 11 months)
 - Built a RAG pipeline over carrier rate documents using LangChain + Pinecone,
   cutting manual rate lookup time significantly.
 - Improved BOL/invoice extraction accuracy through better OCR pre-processing.
 
-Backend Developer — Nimbus Cloud Solutions (Aug 2022 – Jan 2024, 1.5 years)
+Backend Developer â€” Nimbus Cloud Solutions (Aug 2022 â€“ Jan 2024, 1.5 years)
 - Built Python microservices for a SaaS analytics product used by 50+ enterprise
   clients.
 - Led a 4-person team migrating a legacy monolith to microservices.
