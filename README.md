@@ -40,10 +40,10 @@ graph TD
     A[Source Docs: Resume & Transcript] --> B(Profile Builder)
     B --> C[Round 0: Independent Opinions]
     
-    C --> |Technical Agent (British)| E
-    C --> |Culture Agent (Australian)| E
-    C --> |Manager Agent (American)| E
-    C --> |Skeptic Agent (Indian)| E
+    C --> |Technical Agent - British| E
+    C --> |Culture Agent - Australian| E
+    C --> |Manager Agent - American| E
+    C --> |Skeptic Agent - Indian| E
     
     E{Tension Detector} --> |Disagreements Found| F[Debate Engine]
     F --> |Cross-Examination| E
