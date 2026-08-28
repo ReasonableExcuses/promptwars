@@ -30,6 +30,7 @@ graph TD
 ```
 
 ## ✨ Key Features
+- **Comparative Ranking Module (Bonus)**: A specialized 5th LLM pass (VP of Engineering) that reads the final output of the panel and explicitly frames the business tradeoff between candidates, declaring a winner when appropriate.
 - **Custom Input Engine (Live Testing)**: Judges can bypass the pre-cached examples and paste their own Job Descriptions, Resumes, and Transcripts directly into the UI for live testing.
 - **Evidence Verification**: Validates all agent quotes against the source documents using fuzzy string matching, natively preventing AI hallucinations with visual ✅/❌ UI badges.
 - **Tension Detection & Debate**: Mathematically calculates Disagreement Magnitudes between agents and forces them to debate specific claims, logging the turn-by-turn timeline in the UI.
