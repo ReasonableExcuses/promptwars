@@ -130,12 +130,7 @@ def run_pipeline(candidate_id: str, name: str, resume_text: str, transcript_text
         json.dump([t.model_dump() for t in debate_log], f, indent=2)
 
     log(f"⚖️ **Phase 4:** Synthesizing Final Decision (Chair Agent)...")
-    try:
-        decision = call_decision_synthesizer(jd_text, opinions, debate_log, tensions)
-    except Exception as e:
-        log(f"Error during decision synthesis: {e}")
-        traceback.print_exc()
-        return "Failed to synthesize decision."
+    decision = call_decision_synthesizer(jd_text, opinions, debate_log, tensions)
         
     with open(f"runs/{candidate_id}_decision.json", "w", encoding="utf-8") as f:
         f.write(decision.model_dump_json(indent=2))
