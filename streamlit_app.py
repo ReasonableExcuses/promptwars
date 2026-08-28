@@ -116,7 +116,7 @@ st.markdown('<h1 class="main-title">Multi-Agent AI Interview Panel</h1>', unsafe
 st.markdown('<div class="subtitle">Simulating real-world debate among distinct AI personas with cross-examination.</div>', unsafe_allow_html=True)
 
 # Sidebar
-st.sidebar.image("https://via.placeholder.com/400x150.png?text=PromptWars+Engine", use_column_width=True)
+st.sidebar.image("https://via.placeholder.com/400x150.png?text=PromptWars+Engine", use_container_width=True)
 st.sidebar.header("⚙️ Configuration")
 mode = st.sidebar.radio("Run Mode", ["View Example (Offline)", "Live Run (Requires API Key)"])
 
